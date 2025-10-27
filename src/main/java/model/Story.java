@@ -20,6 +20,7 @@ public class Story {
     private String title;
     private String genre;
     private String summary;
+    private final StringBuilder output;
     private final List<Chapter> chapters;
     private final List<Character> characters;
     private final World world;
@@ -29,15 +30,20 @@ public class Story {
     public Story(String title, String strategy){ //strategy here?
         this.title = title;
         this.settings = new StorySettings(); //default - short, child-friendly, descriptive
-        this.tags = new ArrayList<String>();
-        this.chapters = new ArrayList<Chapter>();
-        this.characters = new ArrayList<Character>();
+        this.tags = new ArrayList<>();
+        this.chapters = new ArrayList<>();
+        this.characters = new ArrayList<>();
         this.strategy = strategy;
         this.world = new World();
+        this.output = new StringBuilder();
     }
 
 
     //GETTERS & SETTERS
+    //strategy
+    public String getStrategy(){
+        return strategy;
+    }
     //title
     public void setTitle(String title){
         this.title = title;
@@ -55,9 +61,9 @@ public class Story {
     }
     //------------------------------------------------------------------------
     //summary
-    public void setSummary(){
+    public void setSummary(String genSummary){
         //generate summary - maybe with apiservice?
-        //this.summary = generatedSummary;
+        this.summary = genSummary;
     }
     public String getSummary(){
         return this.summary;
@@ -117,5 +123,25 @@ public class Story {
     }
     public void removeCharacter(int pos){
         this.characters.remove(pos);
+    }
+    //------------------------------------------------------------------------
+    //output
+    public String getOutput(){
+        return this.output.toString();
+    }
+    public void addOutput(String output){
+        this.output.append(output);
+    }
+    public void clearOutput(){
+        this.output.setLength(0);
+    }
+    //content
+    public String getContent(){ //returns full content of the story
+        StringBuilder sb = new StringBuilder();
+        for (Chapter ch : this.chapters){
+            sb.append(ch.getText());
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
