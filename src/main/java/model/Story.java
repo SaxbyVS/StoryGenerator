@@ -73,8 +73,8 @@ public class Story {
     public List<Chapter> getChapters(){
         return this.chapters;
     }
-    public void addChapter(String text){
-        Chapter newChapter = new Chapter(Integer.toString(this.chapters.size()+1), text);
+    public void addChapter(){ //add current output as new chapter
+        Chapter newChapter = new Chapter(Integer.toString(this.chapters.size()+1), this.output.toString());
         this.chapters.add(newChapter);
     }
     public void removeChapter(int pos){
