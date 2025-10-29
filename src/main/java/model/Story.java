@@ -118,6 +118,15 @@ public class Story {
     public List<Character> getCharacters(){
         return this.characters;
     }
+    public void editCharacter(String charName, String cName, List<String> traits, String backstory){
+        for (Character character : this.characters){
+            if (character.getName().equals(charName)){
+                character.setName(cName);
+                character.setTraits(traits);
+                character.setBackstory(backstory);
+            }
+        }
+    }
     public void addCharacter(String cName, List<String> traits, String backstory){
         this.characters.add(new Character(cName, traits, backstory));
     }

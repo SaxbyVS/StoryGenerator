@@ -160,6 +160,10 @@ public class StoryModel {
         Story st = Library.get(title);
         st.removeCharacter(pos);
     }
+    public void editCharacter(String title, String charName, String cName, List<String> traits, String backstory){
+        Story st = Library.get(title);
+        st.editCharacter(charName, cName, traits, backstory);
+    }
 
     //Output
     public String getOutput(String title){
