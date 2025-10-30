@@ -18,7 +18,7 @@ Incomplete/To-do:
  (different controllers for different ui screens?)
     - (possibly favorite)
     - set summary (setSummary here should generate summary)
-
+    - save/load
     -----------------------------
     - AI API integration + whatever is needed for that (strategy classes should probably take in the ai client)
  */
