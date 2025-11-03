@@ -47,4 +47,9 @@ public class Character {
     public void removeTrait(String trait){
         this.traits.remove(trait);
     }
+
+    @Override
+    public String toString() {
+        return "Character {" + "name = "+name + ", traits = " + String.join(", ", traits) + ", backstory = " + backstory + '}';
+    }
 }

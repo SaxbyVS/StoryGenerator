@@ -67,4 +67,20 @@ public class World {
     public void setWorldDescription(String worldDescription){
         this.worldDescription = worldDescription;
     }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("World {name = ").append(worldName).append("\n");
+        sb.append("description = ").append(worldDescription).append("\n");
+        sb.append("rules = ").append(String.join(", ", worldRules)).append("\n");
+        sb.append("locations:\n");
+
+        for (Map.Entry<String, String> entry : locations.entrySet()){
+            sb.append("\t").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+
+        return sb.toString();
+
+    }
 }

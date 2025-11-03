@@ -46,19 +46,19 @@ public class StoryModel {
         switch(strat){
             case "character":
                 CharacterDrivenStrategy cds = new CharacterDrivenStrategy();
-                story.addOutput(cds.generateContent(userPrompt));
+                story.addOutput(cds.generateContent(userPrompt, story));
                 break;
             case "cyoa":
                 CYOAStrategy cyoa = new CYOAStrategy();
-                story.addOutput(cyoa.generateContent(userPrompt));
+                story.addOutput(cyoa.generateContent(userPrompt, story));
                 break;
             case "genre":
                 GenreDrivenStategy gds = new GenreDrivenStategy();
-                story.addOutput(gds.generateContent(userPrompt));
+                story.addOutput(gds.generateContent(userPrompt, story));
                 break;
             case "setting":
                 SettingBasedStrategy sbs = new SettingBasedStrategy();
-                story.addOutput(sbs.generateContent(userPrompt));
+                story.addOutput(sbs.generateContent(userPrompt, story));
         }
     }
 

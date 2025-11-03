@@ -1,6 +1,6 @@
 package model;
 
 public interface AIStrategy {
-    String generateContent(String prompt);
+    String generateContent(String prompt, Story story);
 }
 
