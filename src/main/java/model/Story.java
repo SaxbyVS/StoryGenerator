@@ -62,9 +62,20 @@ public class Story {
     //------------------------------------------------------------------------
     //summary
     public void setSummary(String genSummary){
-        //generate summary - maybe with apiservice?
-        this.summary = genSummary;
+        if (genSummary == null || genSummary.isEmpty()) {
+            String content = getContent();
+            if (content.isEmpty()) {
+                this.summary = "No content available to summarize yet.";
+            } else {
+                int end = Math.min(content.length(), 200);
+                String snippet = content.substring(0, end);
+                this.summary = "Summary: " + snippet + "...";
+            }
+        } else {
+            this.summary = genSummary;
+        }
     }
+
     public String getSummary(){
         return this.summary;
     }

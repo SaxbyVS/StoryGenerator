@@ -10,8 +10,6 @@ SettingsController Class:
     - handles universal story settings
  */
 
-
-
 public class SettingsController {
     private StoryModel storyModel;
 
