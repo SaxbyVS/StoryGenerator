@@ -20,7 +20,7 @@ public class StoryController {
     private boolean onCall = false; // api call in progress or not (for locking UI)
     private StoryModel storyModel;
 
-    // ✅ Observer pattern
+    // Observer pattern
     private List<StoryListener> listeners = new ArrayList<>();
 
     public void addListener(StoryListener l) {
@@ -47,7 +47,7 @@ public class StoryController {
         this.storyModel = storyModel;
     }
 
-    // ✅ Asynchronous story generation with observer notifications
+    // Asynchronous story generation with observer notifications
     public void onGenerate(String title, String userPrompt) {
         try {
             onCall = true; // lock UI during API call

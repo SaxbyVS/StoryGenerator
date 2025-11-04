@@ -61,12 +61,6 @@ public class Story {
     }
     //------------------------------------------------------------------------
     //summary
-    /* public void setSummary(String genSummary){
-        //generate summary - maybe with apiservice?
-        this.summary = genSummary;
-    }*/
-    //------------------------------------------------------------------------
-    //summary
     public void setSummary(String genSummary){
         if (genSummary == null || genSummary.isEmpty()) {
             String content = getContent();
