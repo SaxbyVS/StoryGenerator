@@ -2,7 +2,6 @@ package model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import service.SaveLoad;
 
 /*
 StoryModel class:
@@ -27,7 +26,6 @@ Incomplete/To-do:
 public class StoryModel {
     private Map<String, Story> Library;
     //private OpenAIService client;
-    private SaveLoad Persistence = new SaveLoad();
 
     public StoryModel(String api_key) {
         Library = new HashMap<>();
@@ -66,10 +64,10 @@ public class StoryModel {
 
     //Save/Load
     public void saveSession(){
-        Persistence.save(this.Library);
+
     }
     public void loadSession(){
-        this.Library = Persistence.load();
+
     }
 
     //-------------------------------------------------------------------
