@@ -9,12 +9,6 @@ Story Class:
     - story class encapsulates one story
  */
 
-
-/*
-Incomplete:
-    - setSummary (summary generator)
- */
-
 public class Story {
     private final List<String> tags;
     private String title;

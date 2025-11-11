@@ -1,180 +1,173 @@
 package model;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import service.OpenAIService;
+import java.io.*;
+import java.util.*;
 
 /*
 StoryModel class:
-    - holds library of story objects
-    - can create new stories/remove stories
-    - can continue stories (generate text/chapters) based on strategy
-    - save/load stories to library
-    - edit stories
- */
-
-/*
-Incomplete/To-do:
- (appropriate controller will handle input validation)
- (different controllers for different ui screens?)
-    - (possibly favorite)
-    - set summary (setSummary here should generate summary)
-    - save/load
-    -----------------------------
-    - AI API integration + whatever is needed for that (strategy classes should probably take in the ai client)
+    - Holds library of story objects
+    - Can create/remove/edit stories
+    - Can continue stories (generate text/chapters) based on strategy
+    - Save/load stories to library
+    - Generate summaries (local or via OpenAI)
  */
 
 public class StoryModel {
-    private Map<String, Story> Library;
-    //private OpenAIService client;
+    private final Map<String, Story> library = new HashMap<>();
 
-    public StoryModel(String api_key) {
-        Library = new HashMap<>();
-        //this.client = new OpenAIService(api_key)
+    public StoryModel(String apiKey) {
+        // Currently unused — reserved for OpenAI client initialization if needed
+        // Example: this.client = new OpenAIService(apiKey);
     }
 
-    public void createStory(String title, String strategy){ //creates new story object in library
-        this.Library.put(title, new Story(title, strategy));
+    // Create / Remove
+    public void createStory(String title, String strategy) {
+        library.put(title, new Story(title, strategy));
     }
 
-    public void removeStory(String title){ //delete story from library
-        this.Library.remove(title);
+    public void removeStory(String title) {
+        library.remove(title);
     }
 
-    public void continueStory(String title, String userPrompt){ //generate new output for given story
-        Story story = this.Library.get(title);
+    // Continue story using chosen strategy
+    public void continueStory(String title, String userPrompt) {
+        Story story = getStory(title);
         String strat = story.getStrategy();
-        switch(strat){
-            case "character":
+
+        switch (strat) {
+            case "character" -> {
                 CharacterDrivenStrategy cds = new CharacterDrivenStrategy();
                 story.addOutput(cds.generateContent(userPrompt, story));
-                break;
-            case "cyoa":
+            }
+            case "cyoa" -> {
                 CYOAStrategy cyoa = new CYOAStrategy();
                 story.addOutput(cyoa.generateContent(userPrompt, story));
-                break;
-            case "genre":
+            }
+            case "genre" -> {
                 GenreDrivenStategy gds = new GenreDrivenStategy();
                 story.addOutput(gds.generateContent(userPrompt, story));
-                break;
-            case "setting":
+            }
+            case "setting" -> {
                 SettingBasedStrategy sbs = new SettingBasedStrategy();
                 story.addOutput(sbs.generateContent(userPrompt, story));
+            }
+            default -> System.err.println("Unknown strategy: " + strat);
         }
     }
 
-    //Save/Load
-    public void saveSession(){
-
-    }
-    public void loadSession(){
-
-    }
-
-    //-------------------------------------------------------------------
-    //-------------------------------------------------------------------
-    //Story Editing
-
-
-    //Tags
-    public List<String> getTags(String title){ //return tags of given story
-        Story st = Library.get(title);
-        return st.getTags();
-    }
-    public void addTag(String title, String tag){ //add tag to given story
-        Story st = Library.get(title);
-        st.addTag(tag);
-    }
-    public void removeTag(String title, String tag){ //remove tag from given story
-        Story st = Library.get(title);
-        st.removeTag(tag);
+    // Save / Load
+    public void saveSession() {
+        try (ObjectOutputStream out = new ObjectOutputStream(
+                new FileOutputStream(System.getProperty("user.home") + "/storyLibrary.dat"))) {
+            out.writeObject(library);
+            System.out.println("Session saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Failed to save session: " + e.getMessage());
+        }
     }
 
-    //Strategy
-    public String getStrategy(String title){ //return strategy of given story
-        Story st = Library.get(title);
-        return st.getStrategy();
+    @SuppressWarnings("unchecked")
+    public void loadSession() {
+        try (ObjectInputStream in = new ObjectInputStream(
+                new FileInputStream(System.getProperty("user.home") + "/storyLibrary.dat"))) {
+            Map<String, Story> loaded = (Map<String, Story>) in.readObject();
+            library.clear();
+            library.putAll(loaded);
+            System.out.println("Session loaded successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to load session: " + e.getMessage());
+        }
     }
 
-    //Titles
-    public void setTitle(String title, String new_title){ //new title for given story
-        Story st = Library.get(title);
-        st.setTitle(new_title);
+    // -----------------------------
+    // Story Editing / Accessors
+    // -----------------------------
+    private Story getStory(String title) {
+        Story story = library.get(title);
+        if (story == null) {
+            throw new IllegalArgumentException("Story not found: " + title);
+        }
+        return story;
     }
 
-    //Summary
-    public String getSummary(String title){ //return summary of given story
-        Story st = Library.get(title);
-        return st.getSummary();
-    }
-    public void setSummary(String title){
-        Story st = Library.get(title);
-        //String generated_summary = client.summarize(st);
-        //ai service's summarize (wherever it is) will get content of story and call api to summarize
-        //st.setSummary(generated_summary);
+    // Tags
+    public List<String> getTags(String title) { return getStory(title).getTags(); }
+    public void addTag(String title, String tag) { getStory(title).addTag(tag); }
+    public void removeTag(String title, String tag) { getStory(title).removeTag(tag); }
+
+    // Strategy
+    public String getStrategy(String title) { return getStory(title).getStrategy(); }
+
+    // Title
+    public void setTitle(String title, String newTitle) { getStory(title).setTitle(newTitle); }
+
+    // Summary
+    public String getSummary(String title) { return getStory(title).getSummary(); }
+
+    public void setSummary(String title) {
+        Story st = getStory(title);
+        String content = st.getContent();
+
+        if (content == null || content.isEmpty()) {
+            st.setSummary("No story content available to summarize yet.");
+            return;
+        }
+
+        try {
+            // Try using OpenAI if available
+            String apiKey = OpenAIService.loadApiKey();
+            if (apiKey != null && !apiKey.isEmpty()) {
+                OpenAIService ai = new OpenAIService(apiKey);
+                String aiSummary = ai.summarize(content);
+                st.setSummary(aiSummary);
+            } else {
+                // Fallback local summary
+                int end = Math.min(content.length(), 200);
+                String snippet = content.substring(0, end);
+                st.setSummary("Summary: " + snippet + "...");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to generate AI summary: " + e.getMessage());
+        }
     }
 
-    //Chapter
-    public List<Chapter> getChapters(String title){
-        Story st = Library.get(title);
-        return st.getChapters();
-    }
-    public void addChapter(String title){
-        Story st = Library.get(title);
-        st.addChapter();
-    }
-    public void removeChapter(String title, int pos){
-        Story st = Library.get(title);
-        st.removeChapter(pos);
+    // Chapters
+    public List<Chapter> getChapters(String title) { return getStory(title).getChapters(); }
+    public void addChapter(String title) { getStory(title).addChapter(); }
+    public void removeChapter(String title, int pos) { getStory(title).removeChapter(pos); }
+
+    // StorySettings
+    public StorySettings getSettings(String title) { return getStory(title).getSettings(); }
+    public void setSettings(String title, String length, String complexity, String style) {
+        getStory(title).setSettings(length, complexity, style);
     }
 
-    //StorySettings
-    public StorySettings getSettings(String title){
-        Story st = Library.get(title);
-        return st.getSettings();
-    }
-    public void setSettings(String title, String length, String complexity, String style){
-        Story st = Library.get(title);
-        st.setSettings(length, complexity, style);
+    // World
+    public World getWorld(String title) { return getStory(title).getWorld(); }
+    public void setWorld(String title, String worldName, List<String> worldRules,
+                         Map<String, String> locations, String worldDescription) {
+        getStory(title).setWorld(worldName, worldRules, locations, worldDescription);
     }
 
-    //World
-    public World getWorld(String title){
-        Story st = Library.get(title);
-        return st.getWorld();
+    // Characters
+    public List<Character> getCharacters(String title) { return getStory(title).getCharacters(); }
+    public void addCharacter(String title, String cName, List<String> traits, String backstory) {
+        getStory(title).addCharacter(cName, traits, backstory);
     }
-    public void setWorld(String title, String worldName, List<String> worldRules, Map<String, String> locations, String worldDescription){
-        Story st = Library.get(title);
-        st.setWorld(worldName, worldRules, locations, worldDescription);
-    }
-
-    //Character
-    public List<Character> getCharacters(String title){
-        Story st = Library.get(title);
-        return st.getCharacters();
-    }
-    public void addCharacter(String title, String cName, List<String> traits, String backstory){
-        Story st = Library.get(title);
-        st.addCharacter(cName, traits, backstory);
-    }
-    public void removeCharacter(String title, int pos){
-        Story st = Library.get(title);
-        st.removeCharacter(pos);
-    }
-    public void editCharacter(String title, String charName, String cName, List<String> traits, String backstory){
-        Story st = Library.get(title);
-        st.editCharacter(charName, cName, traits, backstory);
+    public void removeCharacter(String title, int pos) { getStory(title).removeCharacter(pos); }
+    public void editCharacter(String title, String charName, String cName,
+                              List<String> traits, String backstory) {
+        getStory(title).editCharacter(charName, cName, traits, backstory);
     }
 
-    //Output
-    public String getOutput(String title){
-        Story st = Library.get(title);
-        return st.getOutput();
+    // Output
+    public String getOutput(String title) { return getStory(title).getOutput(); }
+    public void clearOutput(String title) { getStory(title).clearOutput(); }
+
+    public Story getStoryPublic(String title) {
+        return getStory(title);
     }
-    public void clearOutput(String title){
-        Story st = Library.get(title);
-        st.clearOutput();
-    }
-
-
-
 }
+
+
