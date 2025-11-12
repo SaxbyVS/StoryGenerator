@@ -30,8 +30,6 @@ public class Story {
         this.strategy = strategy;
         this.world = new World();
         this.output = new StringBuilder();
-        this.summary = "";
-        this.genre = "";
     }
 
 
