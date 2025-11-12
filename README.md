@@ -10,4 +10,5 @@
  - Strategy: Allows for different story creation modes | Associated with different customization features and nuanced api calls
  - Factory: Input validation
  - Observer: Story listener within controller
+ - Singleton: OpenAIService
 ## Demo
