@@ -110,6 +110,9 @@ public class StoryController {
         }
     }
 
+    //output
+    public String getOutput(String title){return storyModel.getOutput(title);}
+
     // summary
     public String getSummary(String title) { // story outline/summary feature
         return storyModel.getSummary(title);
