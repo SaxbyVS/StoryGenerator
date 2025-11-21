@@ -47,35 +47,49 @@ public class StoryController {
         this.storyModel = storyModel;
     }
 
-    // Asynchronous story generation with observer notifications
+
     public void onGenerate(String title, String userPrompt) {
         try {
-            onCall = true; // lock UI during API call
+            onCall = true;
+            continueStory(title, userPrompt);   // blocking
+            storyModel.setSummary(title);       // blocking
 
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    continueStory(title, userPrompt);   // Generate story content
-                    storyModel.setSummary(title);       // Then generate summary
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    onCall = false; // unlock UI
-                    try {
-                        notifyStoryGenerated(title);
-                    } catch (Exception e) {
-                        notifyError(e.getMessage());
-                    }
-                }
-            }.execute();
+            onCall = false;
+            // Notify listeners
+            notifyStoryGenerated(title);
 
         } catch (Exception e) {
             onCall = false;
             notifyError(e.getMessage());
-            e.printStackTrace();
         }
+
+//        try {
+//            onCall = true; // lock UI during API call
+//
+//            new SwingWorker<Void, Void>() {
+//                @Override
+//                protected Void doInBackground() throws Exception {
+//                    continueStory(title, userPrompt);   // Generate story content
+//                    storyModel.setSummary(title);       // Then generate summary
+//                    return null;
+//                }
+//
+//                @Override
+//                protected void done() {
+//                    onCall = false; // unlock UI
+//                    try {
+//                        notifyStoryGenerated(title);
+//                    } catch (Exception e) {
+//                        notifyError(e.getMessage());
+//                    }
+//                }
+//            }.execute();
+//
+//        } catch (Exception e) {
+//            onCall = false;
+//            notifyError(e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     // ============================
@@ -109,6 +123,11 @@ public class StoryController {
         } else {
             throw new IllegalArgumentException("ERROR: invalid user prompt.");
         }
+    }
+
+    private void addChapter(String title){
+        //adds current output to new chapter; can be used before output clear if you want to save
+        storyModel.addChapter(title);
     }
 
     // Output

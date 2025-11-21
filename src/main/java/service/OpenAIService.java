@@ -159,7 +159,7 @@ public class OpenAIService {
     public OpenAIService() {
         Properties props = new Properties();
         String key = null;
-
+        System.out.println("DEBUG: ctor for OpenAIService");
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {
                 System.err.println("config.properties NOT found in classpath.");
@@ -224,7 +224,7 @@ public class OpenAIService {
             if (!json.has("choices")) {
                 return "ERROR: Invalid OpenAI response.";
             }
-
+            System.out.println("DEBUG: generateStory - about to return string response from api.");
             return json.getJSONArray("choices")
                     .getJSONObject(0)
                     .getJSONObject("message")

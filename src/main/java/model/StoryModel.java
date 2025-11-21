@@ -54,6 +54,7 @@ public class StoryModel {
             }
             default -> System.err.println("Unknown strategy: " + strat);
         }
+//        System.out.println("DEBUG: output\n" + story.getOutput());
     }
 
     // Save / Load
@@ -107,7 +108,14 @@ public class StoryModel {
 
     public void setSummary(String title) {
         Story st = getStory(title);
-        String content = st.getContent();
+        String content;
+        if (!st.getChapters().isEmpty()){
+            content = st.getContent(); // summarize all saved content
+        } else{
+            //PROTOTYPE DEMOING
+            content = st.getOutput(); //if no saved content, summarize current output
+        }
+
 
         if (content == null || content.isEmpty()) {
             st.setSummary("No story content available to summarize yet.");
