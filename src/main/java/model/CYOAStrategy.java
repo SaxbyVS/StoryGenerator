@@ -1,25 +1,19 @@
 package model;
 
-import com.sun.net.httpserver.Request;
+import service.OpenAIService;
 import service.RequestBuilder;
 
-//CHOOSE YOUR OWN ADVENTURE
-public class CYOAStrategy implements AIStrategy{
-    //private aiservice whatever
-
-    //ctor
+public class CYOAStrategy implements AIStrategy {
 
     @Override
     public String generateContent(String userPrompt, Story story) {
-        String content = "";
-        String prompt;
-
-        //configure prompt using request builder for CYOA story (add user prompt)
-        prompt = RequestBuilder.buildPrompt(userPrompt, story, "cyoa");
-
-        //content = aiservice generate(prompt, temperature, tokens)
-        //high temperature? - most barebones gen mode - no genre,world,characters (give it high creativity to balance)
-
-        return content;
+        try {
+            OpenAIService ai = OpenAIService.getInstance();
+            String prompt = RequestBuilder.buildPrompt(userPrompt, story, "cyoa");
+            return ai.generateStory(prompt); // works if generateStory() exists
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error generating CYOA content: " + e.getMessage();
+        }
     }
 }

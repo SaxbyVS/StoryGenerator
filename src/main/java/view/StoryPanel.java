@@ -158,10 +158,21 @@ public class StoryPanel extends JPanel {
 
                 @Override
                 protected void done() {
-                    outputArea.setText("Story generated successfully!\n\n" + controller.getSummary(title));
+                    String storyOutput = controller.getOutput(title);
+                    String summary = controller.getSummary(title);
+
+                    outputArea.setText(
+                            "Story generated successfully!\n\n"
+                                    + "── STORY ──\n\n"
+                                    + storyOutput
+                                    + "\n\n── SUMMARY ──\n"
+                                    + summary
+                    );
+
                     generateButton.setEnabled(true);
                     progressBar.setVisible(false);
                 }
+
             }.execute();
         }
     }

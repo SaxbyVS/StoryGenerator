@@ -1,21 +1,20 @@
 package model;
 
+import service.OpenAIService;
 import service.RequestBuilder;
 
-public class SettingBasedStrategy implements AIStrategy{
-    //private aiservice whatever
-
-    //ctor
+public class SettingBasedStrategy implements AIStrategy {
 
     @Override
     public String generateContent(String userPrompt, Story story) {
-        String content = "";
-        String prompt;
-
-        //configure prompt using request builder for settings based story (add user prompt)
-        prompt = RequestBuilder.buildPrompt(userPrompt, story, "setting");
-
-        //content = aiservice generate(prompt, temperature, tokens)
-        return content;
+        try {
+            OpenAIService ai = OpenAIService.getInstance();
+            String prompt = RequestBuilder.buildPrompt(userPrompt, story, "setting");
+            return ai.generateStory(prompt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error generating setting-driven content: " + e.getMessage();
+        }
     }
 }
+

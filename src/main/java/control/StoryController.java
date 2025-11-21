@@ -55,8 +55,8 @@ public class StoryController {
             new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    continueStory(title, userPrompt);
-                    storyModel.setSummary(title);
+                    continueStory(title, userPrompt);   // Generate story content
+                    storyModel.setSummary(title);       // Then generate summary
                     return null;
                 }
 
@@ -78,9 +78,10 @@ public class StoryController {
         }
     }
 
-    // ===== Model routers =====
+    // ============================
+    // Model routers
+    // ============================
 
-    // save/load
     public void saveSession() {
         storyModel.saveSession();
     }
@@ -89,7 +90,7 @@ public class StoryController {
         storyModel.loadSession();
     }
 
-    // create/remove/continue story
+    // Create/remove/continue story
     public void createStory(String title, String strategy) {
         if (InputValidator.validate(title, "story_title")) {
             storyModel.createStory(title, strategy);
@@ -110,15 +111,17 @@ public class StoryController {
         }
     }
 
-    //output
-    public String getOutput(String title){return storyModel.getOutput(title);}
+    // Output
+    public String getOutput(String title) {
+        return storyModel.getOutput(title);
+    }
 
-    // summary
-    public String getSummary(String title) { // story outline/summary feature
+    // Summary
+    public String getSummary(String title) {
         return storyModel.getSummary(title);
     }
 
-    // tags
+    // Tags
     public List<String> getTags(String title) {
         return storyModel.getTags(title);
     }
@@ -134,5 +137,19 @@ public class StoryController {
     public void removeTag(String title, String tag) {
         storyModel.removeTag(title, tag);
     }
+
+    // ======================================
+    // New helper for UI (used by StoryPanel)
+    // ======================================
+    public String getFullOutputAndSummary(String title) {
+        String story = storyModel.getOutput(title);
+        String summary = storyModel.getSummary(title);
+
+        return "—— STORY ——\n" +
+                story +
+                "\n\n—— SUMMARY ——\n" +
+                summary;
+    }
 }
+
 
