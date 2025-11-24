@@ -1,11 +1,13 @@
 package control;
 
+import model.Story;
 import model.StoryModel;
 import util.InputValidator;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 /*
 StoryController Class:
@@ -125,7 +127,15 @@ public class StoryController {
         }
     }
 
-    private void addChapter(String title){
+    public Map<String, Story> getLibrary(){
+        return storyModel.getLibrary();
+    }
+
+    public StoryModel getModel(){  //ONLY USED FOR SETTINGS CHANGE to construct other controllers
+        return this.storyModel;
+    }
+
+    public void addChapter(String title){
         //adds current output to new chapter; can be used before output clear if you want to save
         storyModel.addChapter(title);
     }
@@ -156,6 +166,15 @@ public class StoryController {
     public void removeTag(String title, String tag) {
         storyModel.removeTag(title, tag);
     }
+
+    //GENRE
+    public String getGenre(String title) {
+        return storyModel.getGenre(title);
+    }
+    public void setGenre(String title, String genre) {
+        storyModel.setGenre(title, genre);
+    }
+
 
     // ======================================
     // New helper for UI (used by StoryPanel)

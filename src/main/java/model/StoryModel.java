@@ -21,6 +21,10 @@ public class StoryModel {
         // Example: this.client = new OpenAIService(apiKey);
     }
 
+    public Map<String, Story> getLibrary() {
+        return library;
+    }
+
     // Create / Remove
     public void createStory(String title, String strategy) {
         library.put(title, new Story(title, strategy));
@@ -175,6 +179,14 @@ public class StoryModel {
 
     public Story getStoryPublic(String title) {
         return getStory(title);
+    }
+
+    //GENRE
+    public void setGenre(String title, String genre){
+        getStory(title).setGenre(genre);
+    }
+    public String getGenre(String title){
+        return getStory(title).getGenre();
     }
 }
 
