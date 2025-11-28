@@ -175,6 +175,10 @@ public class StoryController {
         storyModel.setGenre(title, genre);
     }
 
+    //STRAT
+    public String getStrategy(String title) {
+        return storyModel.getStrategy(title);
+    }
 
     // ======================================
     // New helper for UI (used by StoryPanel)
