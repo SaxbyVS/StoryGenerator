@@ -8,16 +8,19 @@ import control.StoryController;
 
 public class StoryPanel extends JPanel {
     private final StoryController controller;
-    private final JTextField titleField;
+//    private final JTextField titleField;
     private final JTextArea promptArea;
     private final JTextArea outputArea;
-    private final JComboBox<String> strategyBox;
+//    private final JComboBox<String> strategyBox;
     private final JButton generateButton;
     private final JButton clearButton;
     private final JProgressBar progressBar;
+    private final String currStory;
 
-    public StoryPanel(StoryController controller) {
+    public StoryPanel(StoryController controller, String story_title) {
         this.controller = controller;
+        this.currStory = story_title;
+
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         setBackground(new Color(245, 247, 250));
@@ -29,25 +32,25 @@ public class StoryPanel extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel titleLabel = new JLabel("Story Title:");
+        JLabel titleLabel = new JLabel("Story Title: "+story_title);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-        titleField = new JTextField();
-        styleInput(titleField);
+//        titleField = new JTextField();
+//        styleInput(titleField);
 
         JLabel promptLabel = new JLabel("Prompt / Idea:");
         promptLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         promptArea = new JTextArea(4, 20);
         styleTextArea(promptArea);
 
-        JLabel strategyLabel = new JLabel("Story Mode:");
+        JLabel strategyLabel = new JLabel("Story Mode: "+controller.getStrategy(currStory));
         strategyLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-        strategyBox = new JComboBox<>(new String[]{"character", "cyoa", "genre", "setting"});
-        styleCombo(strategyBox);
+//        strategyBox = new JComboBox<>(new String[]{"character", "cyoa", "genre", "setting"});
+//        styleCombo(strategyBox);
 
         gbc.gridx = 0; gbc.gridy = 0;
         inputPanel.add(titleLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 0;
-        inputPanel.add(titleField, gbc);
+//        gbc.gridx = 1; gbc.gridy = 0;
+//        inputPanel.add(titleField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
         inputPanel.add(promptLabel, gbc);
@@ -56,8 +59,8 @@ public class StoryPanel extends JPanel {
 
         gbc.gridx = 0; gbc.gridy = 2;
         inputPanel.add(strategyLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 2;
-        inputPanel.add(strategyBox, gbc);
+//        gbc.gridx = 1; gbc.gridy = 2;
+//        inputPanel.add(strategyBox, gbc);
 
         add(inputPanel, BorderLayout.NORTH);
 
@@ -91,10 +94,24 @@ public class StoryPanel extends JPanel {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
+        //SETTINGS BUTTON - makes new settingsFrame window
+        JButton SettingsButton = new JButton("Settings");
+        SettingsButton.setBackground(Color.blue);
+        SettingsButton.setForeground(Color.white);
+        SettingsButton.setFont(new Font("SansSerif", Font.BOLD, 20));
+        SettingsButton.setFocusPainted(false);
+        SettingsButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        SettingsButton.addActionListener(e -> {
+            SettingsFrame settingsWindow = new SettingsFrame(controller, currStory);
+            settingsWindow.setVisible(true);
+        });
+
+        add(SettingsButton, BorderLayout.EAST);
+
         // Event listeners
         generateButton.addActionListener(new GenerateListener());
         clearButton.addActionListener(e -> {
-            titleField.setText("");
+//            titleField.setText("");
             promptArea.setText("");
             outputArea.setText("");
         });
@@ -131,14 +148,14 @@ public class StoryPanel extends JPanel {
     private class GenerateListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String title = titleField.getText().trim();
+            String title = currStory;
             String prompt = promptArea.getText().trim();
-            String strategy = (String) strategyBox.getSelectedItem();
+//            String strategy = controller.getStrategy(currStory);
 
             if (title.isEmpty() || prompt.isEmpty()) {
                 JOptionPane.showMessageDialog(
                         StoryPanel.this,
-                        "Please enter a title and a prompt before generating.",
+                        "Please enter a prompt before generating.",
                         "Missing Input",
                         JOptionPane.WARNING_MESSAGE
                 );
@@ -151,7 +168,7 @@ public class StoryPanel extends JPanel {
             new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() {
-                    controller.createStory(title, strategy);
+//                    controller.createStory(title, strategy);
                     controller.onGenerate(title, prompt);
                     return null;
                 }

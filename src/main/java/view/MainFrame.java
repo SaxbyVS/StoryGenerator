@@ -2,6 +2,8 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Map;
 
 import control.StoryController;
@@ -45,10 +47,17 @@ public class MainFrame extends JFrame {
         title.setForeground(new Color(40, 44, 52));
         title.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
+        //CREATE STORY BUTTON - asks for title/strat first before going to StoryEditorFrame <- (story is created here)
         JButton createStoryButton = new JButton("Create Story");
         createStoryButton.addActionListener(e -> {
             this.setVisible(false);
-            StoryEditorFrame editor = new StoryEditorFrame(this, storyController);
+            StorySetup.SetupResult setup = StorySetup.show(this);
+
+            if (setup == null){ //invalid input or cancel
+                return;
+            }
+
+            StoryEditorFrame editor = new StoryEditorFrame(this, storyController, setup.title, setup.strat);
             editor.setVisible(true);
         });
 
@@ -75,9 +84,11 @@ public class MainFrame extends JFrame {
 
     private void buildList(JPanel center){
         //create story rows
+        System.out.println("DEBUG: buildList");
         Map<String, Story> StoryList = this.storyController.getLibrary();
 
         for (Map.Entry<String, Story> entry : StoryList.entrySet()) {
+            System.out.println("DEBUG: entry - "+entry.getValue().getTitle());
             center.add(createStoryRow(entry.getValue()));
         }
 
@@ -116,12 +127,27 @@ public class MainFrame extends JFrame {
 class StoryEditorFrame extends JFrame{
     private final StoryController storyController;
     private final MainFrame parent;
-    public StoryEditorFrame(MainFrame parent, StoryController storyController) {
+    private final String currStory;
+    private final String currStrat;
+    public StoryEditorFrame(MainFrame parent, StoryController storyController, String story_title, String story_strat) {
         //pass along controller and parent frame
         this.storyController = storyController;
         this.parent = parent;
+        this.currStory = story_title;
+        this.currStrat = story_strat;
 
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        //in case save and close btn is not used
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dispose();
+                parent.setVisible(true);
+                parent.refresh();
+            }
+        });
+
+
         setSize(1000, 750);
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(850, 600));
@@ -133,7 +159,7 @@ class StoryEditorFrame extends JFrame{
 
 
         //title
-        JLabel title = new JLabel("AI Story Generator", SwingConstants.CENTER);
+        JLabel title = new JLabel("AI Story Generator " , SwingConstants.CENTER);
         title.setFont(new Font("Poppins", Font.BOLD, 28));
         title.setForeground(new Color(40, 44, 52));
         title.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
@@ -156,8 +182,15 @@ class StoryEditorFrame extends JFrame{
         add(northPanel, BorderLayout.NORTH);
         //--------------------------
 
+        /*
+        ************************
+        * CREATE STORY
+        * **********************
+         */
+        storyController.createStory(currStory, currStrat);
+
         // Main panel
-        add(new StoryPanel(storyController), BorderLayout.CENTER);
+        add(new StoryPanel(storyController, currStory), BorderLayout.CENTER);
 
         // Footer
         JLabel footer = new JLabel("Powered by OpenAI • Designed by Rayan", SwingConstants.CENTER);
@@ -169,6 +202,46 @@ class StoryEditorFrame extends JFrame{
 
 
 //        setVisible(true);
+    }
+}
+
+
+
+class StorySetup { //used when creating stories to get title/strat first; prior to editor frame switch
+    public static SetupResult show(Component parent){
+        JTextField titleField = new JTextField(20);
+        String[] strats = {"character", "setting", "cyoa", "genre"};
+        JComboBox<String> stratsComboBox = new JComboBox<>(strats);
+        stratsComboBox.setSelectedIndex(0);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(0,1,5,5));
+        panel.add(new JLabel("Story Title"));
+        panel.add(titleField);
+        panel.add(new JLabel("Choose Strategy:"));
+        panel.add(stratsComboBox);
+
+        int result = JOptionPane.showConfirmDialog(parent, panel, "Story Setup", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if(result == JOptionPane.OK_OPTION){ //user ready to move to storyeditor
+            String title = titleField.getText();
+            String strategy = (String) stratsComboBox.getSelectedItem();
+
+            if (title.isEmpty()){ //check title has been entered
+                JOptionPane.showMessageDialog(parent, "Please enter a story title before continuing.");
+                return null;
+            }
+            return new SetupResult(title, strategy);
+        }
+        return null;
+    }
+
+    public static class SetupResult{
+        public final String title;
+        public final String strat;
+        public SetupResult(String title, String strat){
+            this.title = title;
+            this.strat = strat;
+        }
     }
 }
 

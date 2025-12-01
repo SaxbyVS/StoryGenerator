@@ -20,8 +20,8 @@ public class SettingsFrame extends JFrame {
         this.storyController = storyController;
         StoryModel storyModel = storyController.getModel();
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(700, 700);
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(350, 350));
         setLayout(new BorderLayout());
@@ -133,6 +133,7 @@ class CharacterPanel extends JPanel{
                 if (traitInput == null || traitInput.trim().equals("")){
                     break;
                 }
+                traits.add(traitInput);
             }
             String backstory = JOptionPane.showInputDialog("Enter a backstory: ");
             if (backstory == null){
@@ -154,10 +155,15 @@ class CharacterPanel extends JPanel{
         centralCharPanel.add(cJList);
         centralCharPanel.add(characterTextArea);
 
+        JPanel charButtonPanel = new JPanel();
+        charButtonPanel.setLayout(new BoxLayout(charButtonPanel, BoxLayout.Y_AXIS));
+        charButtonPanel.add(addCharacterButton);
+        charButtonPanel.add(removeCharacterButton);
+
 
         add(centralCharPanel, BorderLayout.CENTER);
-        add(addCharacterButton, BorderLayout.EAST);
-        add(removeCharacterButton, BorderLayout.EAST);
+        add(charButtonPanel, BorderLayout.EAST);
+
 
     }
 }
@@ -179,7 +185,7 @@ class WorldPanel extends JPanel{
         }
         JScrollPane descScrollPane = new JScrollPane(worldNameField);
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        add(descScrollPane, BorderLayout.NORTH);
+
 
         //World Description @@@@@@@@@@@@@@@@@@@@@@@@@@
         JTextArea worldDescriptionArea = new JTextArea(5, 30);
@@ -189,8 +195,17 @@ class WorldPanel extends JPanel{
         if(currWorldDescription != null){
             worldDescriptionArea.setText(currWorldDescription);
         }
+        JScrollPane worldScrollPane = new JScrollPane(worldDescriptionArea);
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        add(worldDescriptionArea, BorderLayout.NORTH);
+
+        //north panel - world name + world description
+        JPanel north_panel = new JPanel();
+        north_panel.setLayout(new BoxLayout(north_panel, BoxLayout.Y_AXIS));
+        north_panel.add(new JLabel("World Name: "));
+        north_panel.add(descScrollPane);
+        north_panel.add(new JLabel("Description: "));
+        north_panel.add(worldScrollPane);
+        add(north_panel, BorderLayout.NORTH);
 
         //world rules *********************************
         DefaultListModel<String> rulesModel = new DefaultListModel<>();
@@ -215,9 +230,9 @@ class WorldPanel extends JPanel{
             }
         });
         //*********************************************
-        add(rulesScrollPane, BorderLayout.CENTER);
-        add(addRule, BorderLayout.CENTER);
-        add(removeRule, BorderLayout.CENTER);
+//        add(rulesScrollPane, BorderLayout.CENTER);
+//        add(addRule, BorderLayout.CENTER);
+//        add(removeRule, BorderLayout.CENTER);
 
         //world locations = name + desc -------------------------
         DefaultListModel<String> locationNameModel = new DefaultListModel<>();
@@ -227,6 +242,7 @@ class WorldPanel extends JPanel{
 
         JTextArea locationDescriptionArea = new JTextArea(4, 20);
         locationDescriptionArea.setEditable(false);
+        JScrollPane locationScrollPane = new JScrollPane(locationDescriptionArea);
 
         //display description when selected
         locationsList.addListSelectionListener(e -> {
@@ -261,13 +277,53 @@ class WorldPanel extends JPanel{
             }
         });
         //--------------------------------------
-        add(locationsList, BorderLayout.CENTER);
-        add(locationDescriptionArea, BorderLayout.CENTER);
-        add(addLocation, BorderLayout.SOUTH);
-        add(removeLocation, BorderLayout.SOUTH);
+//        add(locationsList, BorderLayout.CENTER);
+//        add(locationDescriptionArea, BorderLayout.CENTER);
+
+        //center panel add
+        JPanel center_panel = new JPanel(new GridBagLayout());
+
+        JLabel rulesLabel = new JLabel("Rules:");
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0; c.gridy=0;
+        center_panel.add(rulesLabel, c);
+
+        c.gridy = 1; c.gridx=0;
+        c.gridwidth = 2;
+        center_panel.add(rulesScrollPane, c);
+
+        c.gridwidth = 1;
+        c.gridy=2; c.gridx=0;
+        center_panel.add(addRule, c);
+        c.gridy=2; c.gridx=1;
+        center_panel.add(removeRule, c);
+
+        JLabel locationLabel = new JLabel("Locations List:");
+        c.gridy=3; c.gridx=0;
+        center_panel.add(locationLabel, c);
+
+        c.gridy=4; c.gridx=0;
+        c.gridwidth = 2;
+        center_panel.add(locationsList, c);
+
+
+        c.gridy=5; c.gridx=0;
+        c.gridwidth = 2;
+        center_panel.add(locationScrollPane, c);
+
+        c.gridwidth = 1;
+        c.gridy=6; c.gridx=0;
+        center_panel.add(addLocation, c);
+        c.gridy=6; c.gridx=1;
+        center_panel.add(removeLocation, c);
+
+        add(center_panel, BorderLayout.CENTER);
+
 
         //sAVE ALL
         JButton saveWorldButton = new JButton("Save World Settings");
+        saveWorldButton.setBackground(Color.blue);
+        saveWorldButton.setForeground(Color.white);
         saveWorldButton.addActionListener(e -> {
            worldController.setWorld(currStory, worldNameField.getText(), Collections.list(rulesModel.elements()), worldController.getLocations(currStory),worldDescriptionArea.getText());
         });
