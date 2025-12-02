@@ -139,6 +139,9 @@ public class StoryController {
         //adds current output to new chapter; can be used before output clear if you want to save
         storyModel.addChapter(title);
     }
+    public void removeChapter(String title, int pos){
+        storyModel.removeChapter(title, pos);
+    }
 
     // Output
     public String getOutput(String title) {
@@ -191,6 +194,10 @@ public class StoryController {
                 story +
                 "\n\n—— SUMMARY ——\n" +
                 summary;
+    }
+
+    public int getChapterCount(String title){
+        return storyModel.getChapterCount(title);
     }
 }
 

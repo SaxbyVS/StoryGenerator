@@ -146,6 +146,7 @@ public class StoryModel {
 
     // Chapters
     public List<Chapter> getChapters(String title) { return getStory(title).getChapters(); }
+    public int getChapterCount(String title){return getStory(title).getChapters().size();}
     public void addChapter(String title) { getStory(title).addChapter(); }
     public void removeChapter(String title, int pos) { getStory(title).removeChapter(pos); }
 
