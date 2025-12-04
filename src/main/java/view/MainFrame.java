@@ -69,7 +69,12 @@ public class MainFrame extends JFrame {
         //center panel - list of stories
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        buildList(centerPanel);
+
+        JScrollPane scrollPane = new JScrollPane(centerPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        add(scrollPane, BorderLayout.CENTER);
+//        buildList(centerPanel);
 
 
 
@@ -84,33 +89,82 @@ public class MainFrame extends JFrame {
 
     private void buildList(JPanel center){
         //create story rows
-        System.out.println("DEBUG: buildList");
+//        System.out.println("DEBUG: buildList");
+
+        center.removeAll();
+
         Map<String, Story> StoryList = this.storyController.getLibrary();
 
         for (Map.Entry<String, Story> entry : StoryList.entrySet()) {
-            System.out.println("DEBUG: entry - "+entry.getValue().getTitle());
+//            System.out.println("DEBUG: entry - "+entry.getValue().getTitle());
             center.add(createStoryRow(entry.getValue()));
+            center.add(new JSeparator(SwingConstants.HORIZONTAL));
         }
 
-        JScrollPane scrollPane = new JScrollPane(center);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        add(scrollPane, BorderLayout.CENTER);
+        center.revalidate();
+        center.repaint();
+//        System.out.println("DEBUG: end buildList");
     }
 
     private JPanel createStoryRow(Story story) {
+//        System.out.println("DEBUG: createStoryRow");
         JPanel row = new JPanel(new BorderLayout());
-        row.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
         //name and tags
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.add(new JLabel(story.getTitle()));
-        infoPanel.add(new JLabel("Tags: " + story.getTags()));
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        String story_title = story.getTitle();
+        String story_strat = story.getStrategy();
+        JLabel titleLabel = new JLabel("Title: ");
+        JLabel titleNameLabel = new JLabel(story_title);
+        JLabel stratLabel = new JLabel(" [" + story_strat + "]");
+        titleNameLabel.setForeground(Color.BLUE);
+        titlePanel.add(titleLabel);
+        titlePanel.add(titleNameLabel);
+        titlePanel.add(stratLabel);
+
+        JPanel tagsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        String tagString = String.valueOf(story.getTags());
+        JLabel tagsLabel = new JLabel("Tags: ");
+        JLabel tagsNameLabel = new JLabel(tagString);
+        tagsNameLabel.setForeground(Color.green);
+        tagsPanel.add(tagsLabel);
+        tagsPanel.add(tagsNameLabel);
+
+
+        infoPanel.add(titlePanel);
+        infoPanel.add(tagsPanel);
 
         //buttons - EDIT, REMOVE, FAVORITE?, TAGS?
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton editBtn = new JButton("Edit");
+        editBtn.setBackground(Color.blue);
+        editBtn.setForeground(Color.white);
         JButton deleteBtn = new JButton("Delete");
+        deleteBtn.setBackground(Color.red);
+        deleteBtn.setForeground(Color.white);
+
+        editBtn.addActionListener(e->{
+            this.setVisible(false);
+            StoryEditorFrame continueEdit = new StoryEditorFrame(this, storyController, story_title, story_strat);
+            continueEdit.setVisible(true);
+        });
+        deleteBtn.addActionListener(e->{
+            int result = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to delete this story?",
+                    "Confirmation",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (result == JOptionPane.YES_OPTION){
+                storyController.removeStory(story_title);
+                refresh();
+            }
+        });
+
         buttonPanel.add(editBtn);
         buttonPanel.add(deleteBtn);
 
@@ -188,6 +242,7 @@ class StoryEditorFrame extends JFrame{
         * **********************
          */
         storyController.createStory(currStory, currStrat);
+//        System.out.println("DEBUG: curr Library: "+storyController.getLibrary());
 
         // Main panel
         add(new StoryPanel(storyController, currStory), BorderLayout.CENTER);

@@ -97,7 +97,7 @@ public class StoryPanel extends JPanel {
             if (!e.getValueIsAdjusting()){
                 String currChap = jChapterList.getSelectedValue();
                 if (currChap != null){
-                    if (currChap == "Output"){
+                    if (currChap.equals("Output")){
                         outputArea.setText(controller.getOutput(currStory));
                     }else{
                         String selChap = controller.getModel().getChapters(currStory).get(Integer.parseInt(currChap)).getText();
@@ -144,10 +144,25 @@ public class StoryPanel extends JPanel {
                }
            }
         });
+        //summarybutton
+        JButton getSummaryButton = new JButton("Get Current Summary");
+        getSummaryButton.addActionListener(e->{
+            String currSummary = controller.getSummary(currStory);
+            JTextArea summaryArea = new JTextArea(currSummary);
+            summaryArea.setEditable(false);
+            summaryArea.setLineWrap(true);
+            summaryArea.setWrapStyleWord(true);
+
+            JScrollPane summaryScroll = new JScrollPane(summaryArea);
+
+            JOptionPane.showMessageDialog(this, summaryScroll, "Story Summary", JOptionPane.INFORMATION_MESSAGE);
+        });
+
 
         JPanel chapterButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         chapterButtonPanel.add(addChapterButton);
         chapterButtonPanel.add(removeChapterButton);
+        chapterButtonPanel.add(getSummaryButton);
 
 
         //add central panel - output area and chapter bar
@@ -264,14 +279,14 @@ public class StoryPanel extends JPanel {
                 @Override
                 protected void done() {
                     String storyOutput = controller.getOutput(title);
-                    String summary = controller.getSummary(title);
+//                    String summary = controller.getSummary(title);
 
                     outputArea.setText(
                             "Story generated successfully!\n\n"
                                     + "── STORY ──\n\n"
                                     + storyOutput
-                                    + "\n\n── SUMMARY ──\n"
-                                    + summary
+//                                    + "\n\n── SUMMARY ──\n"
+//                                    + summary
                     );
 
                     generateButton.setEnabled(true);
