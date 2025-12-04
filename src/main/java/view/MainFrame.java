@@ -120,7 +120,21 @@ public class MainFrame extends JFrame {
         String story_strat = story.getStrategy();
         JLabel titleLabel = new JLabel("Title: ");
         JLabel titleNameLabel = new JLabel(story_title);
-        JLabel stratLabel = new JLabel(" [" + story_strat + "]");
+        JLabel stratLabel = new JLabel();
+        switch(story_strat){
+            case "character":
+                stratLabel.setText("Mode: [Character-driven]");
+                break;
+            case "cyoa":
+                stratLabel.setText("Mode: [Choose-your-own-adventure]");
+                break;
+            case "genre":
+                stratLabel.setText("Mode: [Genre-driven]");
+                break;
+            case "setting":
+                stratLabel.setText("Mode: [Setting-driven]");
+                break;
+        }
         titleNameLabel.setForeground(Color.BLUE);
         titlePanel.add(titleLabel);
         titlePanel.add(titleNameLabel);
@@ -130,13 +144,32 @@ public class MainFrame extends JFrame {
         String tagString = String.valueOf(story.getTags());
         JLabel tagsLabel = new JLabel("Tags: ");
         JLabel tagsNameLabel = new JLabel(tagString);
-        tagsNameLabel.setForeground(Color.green);
+        tagsNameLabel.setForeground(new Color(34, 139, 34));
         tagsPanel.add(tagsLabel);
         tagsPanel.add(tagsNameLabel);
+        JButton addTagButton = new JButton("Add Tag");
+        addTagButton.setBackground(Color.green);
+        addTagButton.setForeground(new Color(53, 94, 59));
+        JButton removeTagButton = new JButton("Remove Tag");
+        removeTagButton.setBackground(Color.green);
+        removeTagButton.setForeground(new Color(53, 94, 59));
+        addTagButton.addActionListener(e->{
+            String tag = JOptionPane.showInputDialog(this, "Please enter a tag (1 word)", "Add Tag", JOptionPane.PLAIN_MESSAGE);
+            storyController.addTag(story_title, tag);
+            refresh();
+        });
+        removeTagButton.addActionListener(e->{
+            String rTag = JOptionPane.showInputDialog(this, "Enter tag to remove", "Remove Tag", JOptionPane.PLAIN_MESSAGE);
+            storyController.removeTag(story_title, rTag);
+            refresh();
+        });
+        tagsPanel.add(addTagButton);
+        tagsPanel.add(removeTagButton);
 
 
         infoPanel.add(titlePanel);
         infoPanel.add(tagsPanel);
+
 
         //buttons - EDIT, REMOVE, FAVORITE?, TAGS?
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
