@@ -144,11 +144,16 @@ public class StoryModel {
         }
     }
 
+    public void setSummaryCustom(String title, String sum){
+        Story st = getStory(title);
+        st.setSummary(sum);
+    }
+
     // Chapters
     public List<Chapter> getChapters(String title) { return getStory(title).getChapters(); }
     public int getChapterCount(String title){return getStory(title).getChapters().size();}
-    public void addChapter(String title) { getStory(title).addChapter(); }
-    public void removeChapter(String title, int pos) { getStory(title).removeChapter(pos); }
+    public void addChapter(String title, String ctitle) { getStory(title).addChapter(ctitle); }
+    public void removeChapter(String title, String ctitle) { getStory(title).removeChapter(ctitle); }
 
     // StorySettings
     public StorySettings getSettings(String title) { return getStory(title).getSettings(); }

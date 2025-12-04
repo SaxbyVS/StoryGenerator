@@ -100,8 +100,17 @@ public class StoryPanel extends JPanel {
                     if (currChap.equals("Output")){
                         outputArea.setText(controller.getOutput(currStory));
                     }else{
-                        String selChap = controller.getModel().getChapters(currStory).get(Integer.parseInt(currChap)).getText();
-                        outputArea.setText(selChap);
+                        List<Chapter> currChaps = controller.getModel().getChapters(currStory);
+                        Chapter selectedChap;
+                        for (Chapter c: currChaps){
+                            if (c.getTitle().equals(currChap)){
+                                selectedChap = c;
+                                outputArea.setText(selectedChap.getTitle() + "\n" + selectedChap.getText());
+                                break;
+                            }
+                        }
+//                        String selChap = controller.getModel().getChapters(currStory).get(Integer.parseInt(currChap)).getText();
+
                     }
                 }
             }
@@ -118,9 +127,9 @@ public class StoryPanel extends JPanel {
                     JOptionPane.YES_NO_OPTION
             );
             if (result == JOptionPane.YES_OPTION){
-                int chapNum = controller.getChapterCount(currStory);
-                chapterModel.addElement(String.valueOf(chapNum));
-                controller.addChapter(currStory);
+                String chapName = JOptionPane.showInputDialog(this, "Enter chapter name", "Name Chapter", JOptionPane.QUESTION_MESSAGE);
+                chapterModel.addElement(chapName);
+                controller.addChapter(currStory, chapName);
             }
         });
         removeChapterButton.addActionListener(e->{
@@ -136,11 +145,11 @@ public class StoryPanel extends JPanel {
                    JOptionPane.YES_NO_OPTION
            );
            if (result == JOptionPane.YES_OPTION){
-               if (selChap == "Output"){
+               if (selChap.equals("Output")){
                    JOptionPane.showMessageDialog(this,"Cannot remove output");
                }else {
                    chapterModel.removeElement(selChap);
-                   controller.removeChapter(currStory, Integer.parseInt(selChap));
+                   controller.removeChapter(currStory, selChap);
                }
            }
         });
@@ -154,6 +163,7 @@ public class StoryPanel extends JPanel {
             summaryArea.setWrapStyleWord(true);
 
             JScrollPane summaryScroll = new JScrollPane(summaryArea);
+            summaryScroll.setPreferredSize(new Dimension(400, 250));
 
             JOptionPane.showMessageDialog(this, summaryScroll, "Story Summary", JOptionPane.INFORMATION_MESSAGE);
         });

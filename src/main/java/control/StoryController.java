@@ -54,7 +54,7 @@ public class StoryController {
         try {
             onCall = true;
             continueStory(title, userPrompt);   // blocking
-            storyModel.setSummary(title);       // blocking
+//            storyModel.setSummary(title);       // blocking
 
             onCall = false;
             // Notify listeners
@@ -65,33 +65,6 @@ public class StoryController {
             notifyError(e.getMessage());
         }
 
-//        try {
-//            onCall = true; // lock UI during API call
-//
-//            new SwingWorker<Void, Void>() {
-//                @Override
-//                protected Void doInBackground() throws Exception {
-//                    continueStory(title, userPrompt);   // Generate story content
-//                    storyModel.setSummary(title);       // Then generate summary
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    onCall = false; // unlock UI
-//                    try {
-//                        notifyStoryGenerated(title);
-//                    } catch (Exception e) {
-//                        notifyError(e.getMessage());
-//                    }
-//                }
-//            }.execute();
-//
-//        } catch (Exception e) {
-//            onCall = false;
-//            notifyError(e.getMessage());
-//            e.printStackTrace();
-//        }
     }
 
     // ============================
@@ -135,12 +108,19 @@ public class StoryController {
         return this.storyModel;
     }
 
-    public void addChapter(String title){
+    public void addChapter(String title, String cTitle){
         //adds current output to new chapter; can be used before output clear if you want to save
-        storyModel.addChapter(title);
+        storyModel.addChapter(title, cTitle);
+        storyModel.setSummary(title);
     }
-    public void removeChapter(String title, int pos){
-        storyModel.removeChapter(title, pos);
+    public void removeChapter(String title, String cTitle){
+
+        storyModel.removeChapter(title, cTitle);
+        if (storyModel.getChapterCount(title)==0){
+            storyModel.setSummaryCustom(title, "");
+        }else{
+            storyModel.setSummary(title);
+        }
     }
 
     // Output

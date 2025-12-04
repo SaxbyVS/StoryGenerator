@@ -100,13 +100,13 @@ public class Story {
     public List<Chapter> getChapters(){
         return this.chapters;
     }
-    public void addChapter(){
-        Chapter newChapter = new Chapter(Integer.toString(this.chapters.size()+1), this.output.toString());
+    public void addChapter(String ctitle){
+        Chapter newChapter = new Chapter(ctitle, this.output.toString());
         this.chapters.add(newChapter);
         this.output.setLength(0);
     }
-    public void removeChapter(int pos){
-        this.chapters.remove(pos);
+    public void removeChapter(String ctitle){
+        this.chapters.removeIf(c -> c.getTitle().equals(ctitle));
     }
 
     //------------------------------------------------------------------------
