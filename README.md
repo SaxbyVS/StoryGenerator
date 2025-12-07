@@ -4,6 +4,9 @@
 Rayan Zafar and Shane Uriarte
 
 ## Setup
+ - Get your own API key
+ - Insert the API key into config.properties
+ - Run Main.java
 
 
 ## Features
