@@ -14,6 +14,7 @@
  - Singleton Pattern:
 
 ## AI Usage
- - 
+ - Used ChatGPT for help with error handling and project structure
 
 ## Time Spent: ~15 hours
+
