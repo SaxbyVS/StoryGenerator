@@ -4,9 +4,9 @@
 Rayan Zafar and Shane Uriarte
 
 ## Setup
- - Get your own API key
- - Insert the API key into config.properties
- - Run Main.java
+ - Get OpenAI API key from https://platform.openai.com/api-keys
+ - Insert the API key into config.properties (outlined in config.properties.example)
+ - Run Main.java in org.example
 
 
 ## Features
