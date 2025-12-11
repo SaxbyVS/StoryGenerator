@@ -1,6 +1,8 @@
 package model;
 
 import service.OpenAIService;
+import service.SaveLoad;
+
 import java.io.*;
 import java.util.*;
 
@@ -14,7 +16,9 @@ StoryModel class:
  */
 
 public class StoryModel {
-    private final Map<String, Story> library = new HashMap<>();
+//    private final Map<String, Story> library = new HashMap<>();
+    private Map<String, Story> library = new HashMap<>();
+    private final SaveLoad Persistence = new SaveLoad();
 
     public StoryModel(String apiKey) {
         // Currently unused — reserved for OpenAI client initialization if needed
@@ -63,26 +67,29 @@ public class StoryModel {
 
     // Save / Load
     public void saveSession() {
-        try (ObjectOutputStream out = new ObjectOutputStream(
-                new FileOutputStream(System.getProperty("user.home") + "/storyLibrary.dat"))) {
-            out.writeObject(library);
-            System.out.println("Session saved successfully.");
-        } catch (IOException e) {
-            System.err.println("Failed to save session: " + e.getMessage());
-        }
+        Persistence.save(this.library);
+//        try (ObjectOutputStream out = new ObjectOutputStream(
+//                new FileOutputStream(System.getProperty("user.home") + "/storyLibrary.dat"))) {
+//            out.writeObject(library);
+//            System.out.println("Session saved successfully.");
+//        } catch (IOException e) {
+//            System.err.println("Failed to save session: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     @SuppressWarnings("unchecked")
     public void loadSession() {
-        try (ObjectInputStream in = new ObjectInputStream(
-                new FileInputStream(System.getProperty("user.home") + "/storyLibrary.dat"))) {
-            Map<String, Story> loaded = (Map<String, Story>) in.readObject();
-            library.clear();
-            library.putAll(loaded);
-            System.out.println("Session loaded successfully.");
-        } catch (Exception e) {
-            System.err.println("Failed to load session: " + e.getMessage());
-        }
+        this.library = Persistence.load();
+//        try (ObjectInputStream in = new ObjectInputStream(
+//                new FileInputStream(System.getProperty("user.home") + "/storyLibrary.dat"))) {
+//            Map<String, Story> loaded = (Map<String, Story>) in.readObject();
+//            library.clear();
+//            library.putAll(loaded);
+//            System.out.println("Session loaded successfully.");
+//        } catch (Exception e) {
+//            System.err.println("Failed to load session: " + e.getMessage());
+//        }
     }
 
     // -----------------------------
