@@ -194,7 +194,7 @@ public class StoryPanel extends JPanel {
         styleButton(clearButton, new Color(230, 71, 89));
 
         progressBar = new JProgressBar();
-        progressBar.setIndeterminate(false);
+        progressBar.setIndeterminate(true);
         progressBar.setVisible(false);
         progressBar.setPreferredSize(new Dimension(200, 20));
 
@@ -289,15 +289,23 @@ public class StoryPanel extends JPanel {
                 @Override
                 protected void done() {
                     String storyOutput = controller.getOutput(title);
-//                    String summary = controller.getSummary(title);
 
-                    outputArea.setText(
-                            "Story generated successfully!\n\n"
-                                    + "── STORY ──\n\n"
-                                    + storyOutput
-//                                    + "\n\n── SUMMARY ──\n"
-//                                    + summary
-                    );
+                    if (storyOutput.startsWith("ERROR")) {
+                        JOptionPane.showMessageDialog(
+                                StoryPanel.this,
+                                storyOutput,
+                                "Generation Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        outputArea.setText(""); // optional: keep output clean
+                    }
+                    else {
+                        outputArea.setText(
+                                "Story generated successfully!\n\n"
+                                        + "── STORY ──\n\n"
+                                        + storyOutput
+                        );
+                    }
 
                     generateButton.setEnabled(true);
                     progressBar.setVisible(false);

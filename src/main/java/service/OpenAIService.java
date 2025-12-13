@@ -135,6 +135,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Properties;
 
 /*
@@ -194,8 +195,9 @@ public class OpenAIService {
     // Story Generation
     // -------------------------------------------------------------
     public String generateStory(String prompt) {
+
         if (apiKey == null || apiKey.isEmpty()) {
-            return "ERROR: No API key found in config.properties.";
+            return "ERROR: No API key found. Please check your configuration.";
         }
 
         try {
@@ -211,6 +213,7 @@ public class OpenAIService {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.openai.com/v1/chat/completions"))
+                    .timeout(Duration.ofSeconds(60))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + apiKey)
                     .POST(HttpRequest.BodyPublishers.ofString(req.toString()))
@@ -219,20 +222,35 @@ public class OpenAIService {
             HttpResponse<String> response =
                     httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
+            // Handle API-level errors first
+            if (response.statusCode() != 200) {
+                return "ERROR: OpenAI API error (HTTP " + response.statusCode() + ").";
+            }
+
             JSONObject json = new JSONObject(response.body());
 
             if (!json.has("choices")) {
-                return "ERROR: Invalid OpenAI response.";
+                return "ERROR: Invalid response from OpenAI.";
             }
-            System.out.println("DEBUG: generateStory - about to return string response from api.");
+
             return json.getJSONArray("choices")
                     .getJSONObject(0)
                     .getJSONObject("message")
                     .getString("content")
                     .trim();
 
-        } catch (Exception e) {
-            return "ERROR calling OpenAI: " + e.getMessage();
+        }
+        // Network / connectivity issues
+        catch (java.net.UnknownHostException e) {
+            return "ERROR: Network unavailable or DNS blocked.";
+
+        } catch (java.net.http.HttpTimeoutException e) {
+            return "ERROR: Connection timed out.";
+
+        }
+        // Everything else (parsing, unexpected failures)
+        catch (Exception e) {
+            return "ERROR: Unexpected error occurred.";
         }
     }
 
