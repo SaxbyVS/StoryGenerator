@@ -8,6 +8,15 @@ Rayan Zafar and Shane Uriarte
  - Insert the API key into config.properties (outlined in config.properties.example)
  - Run Main.java in org.example
 
+## How to Run
+1. Insert OpenAI API key into config.properties under resources
+2. Run Main.java in org.example
+
+## Tech Stack
+- Java
+- Java Swing
+- JUnit 5
+- OpenAI REST API
 
 ## Features
  - Different Story Creation Modes - Genre-based, Character-driven, Setting-based, Choose-your-own-adventure
