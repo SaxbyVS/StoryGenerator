@@ -13,6 +13,28 @@
  - Observer Pattern: The observer pattern was implemented within the StoryController with the StoryListener and in the StoryPanel with the GenerateListener which implements ActionListener. These notify when actions are being executed and completed.
  - Singleton Pattern: The singleton pattern is used in the OpenAIService object class. This is utilized with getInstance when the different strategies are making their api calls.
 
+## System Design
+- The application follows an MVC-inspired architecture. The Swing-based UI (MainFrame, StoryPanel, and related panels) handles user interaction and display logic. Controllers act as intermediaries between the UI and the data model, coordinating actions such as story generation, editing, and persistence. The StoryModel encapsulates all story-related data, including chapters, characters, tags, and summaries.
+- External AI functionality is isolated within the OpenAIService, which centralizes API access and error handling. Asynchronous operations are handled using SwingWorker to prevent UI blocking during long-running API calls.
+- This modular design improves maintainability, separates concerns, and allows new story modes or UI panels to be added with minimal impact on existing components.
+
+```md
+[ MainFrame / StoryPanel ]
+            |
+            v
+     [ StoryController ]
+            |
+            v
+       [ StoryModel ]
+            |
+            v
+     [ OpenAIService ]
+            |
+            v
+        OpenAI API
+
+```
+
 ## OOP Pillars
  - Encapsulation: Important base classes like Chapter, Character, Story, StoryModel, StorySettings, World, + Controller(s) are appropriately encapsulated with the necessary getters/setters provided for safe use.
  - Inheritance: Inheritance is used extensively for the view implementation, namely in extending JFrame for the MainFrame, StoryEditorFrame, and SettingsFrame; similarly for extending JPanel in StoryPanel, CharacterPanel, GenrePanel, SettingsPanel, and WorldPanel.
@@ -26,4 +48,5 @@
    - By what Swing mechanism can I connect the editor window to the main screen; as in how can I hide the main screen when entering the editor and make it reappear updated automatically when the editor is closed.
 
 ## Time Spent: ~35 hours
+
 
