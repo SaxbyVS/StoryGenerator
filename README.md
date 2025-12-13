@@ -30,7 +30,6 @@ Rayan Zafar and Shane Uriarte
  - Singleton: OpenAIService
 
 ## Demo
-https://youtu.be/_ZNmfSvRMgk?si=tNc198bfsSgSP6r7
-
+https://youtu.be/v6qCKHUD0Bo
 
 
