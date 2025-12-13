@@ -19,6 +19,8 @@ public class StoryPanel extends JPanel {
     private final JButton clearButton;
     private final JProgressBar progressBar;
     private final String currStory;
+    private SwingWorker<Void, Void> currentWorker;
+    private JButton cancelButton;
 
     public StoryPanel(StoryController controller, String story_title) {
         this.controller = controller;
@@ -189,9 +191,12 @@ public class StoryPanel extends JPanel {
         buttonPanel.setBackground(new Color(245, 247, 250));
 
         generateButton = new JButton("Generate Story");
+        cancelButton = new JButton("Cancel");
         clearButton = new JButton("Clear");
         styleButton(generateButton, new Color(88, 101, 242));
+        styleButton(cancelButton, new Color(120, 120, 120));
         styleButton(clearButton, new Color(230, 71, 89));
+        cancelButton.setEnabled(false);
 
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
@@ -199,6 +204,7 @@ public class StoryPanel extends JPanel {
         progressBar.setPreferredSize(new Dimension(200, 20));
 
         buttonPanel.add(generateButton);
+        buttonPanel.add(cancelButton);
         buttonPanel.add(clearButton);
         buttonPanel.add(progressBar);
 
@@ -218,15 +224,17 @@ public class StoryPanel extends JPanel {
 
         add(SettingsButton, BorderLayout.EAST);
 
-
-
-
         // Event listeners
         generateButton.addActionListener(new GenerateListener());
         clearButton.addActionListener(e -> {
 //            titleField.setText("");
             promptArea.setText("");
             outputArea.setText("");
+        });
+        cancelButton.addActionListener(e -> {
+            if (currentWorker != null && !currentWorker.isDone()) {
+                currentWorker.cancel(true);
+            }
         });
     }
 
@@ -278,40 +286,57 @@ public class StoryPanel extends JPanel {
             generateButton.setEnabled(false);
             progressBar.setVisible(true);
 
-            new SwingWorker<Void, Void>() {
+            generateButton.setEnabled(false);
+            cancelButton.setEnabled(true);
+            progressBar.setVisible(true);
+
+            currentWorker = new SwingWorker<Void, Void>() {
+
                 @Override
                 protected Void doInBackground() {
-//                    controller.createStory(title, strategy);
+                    if (isCancelled()) return null;
+
                     controller.onGenerate(title, prompt);
+
+                    if (isCancelled()) return null;
                     return null;
                 }
 
                 @Override
                 protected void done() {
-                    String storyOutput = controller.getOutput(title);
+                    try {
+                        if (isCancelled()) {
+                            outputArea.setText("Generation cancelled.");
+                        } else {
+                            String storyOutput = controller.getOutput(title);
 
-                    if (storyOutput.startsWith("ERROR")) {
-                        JOptionPane.showMessageDialog(
-                                StoryPanel.this,
-                                storyOutput,
-                                "Generation Error",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        outputArea.setText(""); // optional: keep output clean
+                            if (storyOutput.startsWith("ERROR")) {
+                                JOptionPane.showMessageDialog(
+                                        StoryPanel.this,
+                                        storyOutput,
+                                        "Generation Error",
+                                        JOptionPane.ERROR_MESSAGE
+                                );
+                                outputArea.setText("");
+                            } else {
+                                outputArea.setText(
+                                        "Story generated successfully!\n\n"
+                                                + "── STORY ──\n\n"
+                                                + storyOutput
+                                );
+                            }
+                        }
+                    } finally {
+                        generateButton.setEnabled(true);
+                        cancelButton.setEnabled(false);
+                        progressBar.setVisible(false);
+                        currentWorker = null;
                     }
-                    else {
-                        outputArea.setText(
-                                "Story generated successfully!\n\n"
-                                        + "── STORY ──\n\n"
-                                        + storyOutput
-                        );
-                    }
-
-                    generateButton.setEnabled(true);
-                    progressBar.setVisible(false);
                 }
+            };
 
-            }.execute();
+            currentWorker.execute();
+
         }
     }
 }
